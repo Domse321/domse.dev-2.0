@@ -4,8 +4,10 @@
 const { chromium } = require('playwright');
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawn } = require('node:child_process');
 
 const base = (process.env.SPORT_BASE_URL || 'http://127.0.0.1:18778').replace(/\/$/, '');
+const autoServe = !process.env.SPORT_BASE_URL;
 const artifacts = process.env.SPORT_ARTIFACTS || '/tmp/domse-sport-gate';
 fs.mkdirSync(artifacts, { recursive: true });
 
@@ -16,6 +18,17 @@ function check(condition, message) {
 function localDate() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+async function waitForServer(url) {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    try {
+      const response = await fetch(`${url}/sport/`);
+      if (response.ok) return;
+    } catch (_error) { /* server is still starting */ }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`Lokaler Testserver wurde nicht bereit: ${url}`);
 }
 
 async function observe(page) {
@@ -29,6 +42,10 @@ async function observe(page) {
 }
 
 (async () => {
+  const server = autoServe
+    ? spawn('python3', ['-m', 'http.server', '18778', '--bind', '127.0.0.1'], { cwd: path.resolve(__dirname, '..'), stdio: 'ignore' })
+    : null;
+  if (server) await waitForServer(base);
   const browser = await chromium.launch({ headless: true });
   const results = [];
   const matrix = [
@@ -39,14 +56,16 @@ async function observe(page) {
     { name: 'mobile-390', width: 390, height: 844 },
     { name: 'mobile-430', width: 430, height: 932 },
     { name: 'landscape-844', width: 844, height: 390 },
-    { name: 'text-200', width: 390, height: 844, text: 200 }
+    { name: 'text-200', width: 390, height: 844, text: 200 },
+    { name: 'forced-colors', width: 390, height: 844, forcedColors: 'active' }
   ];
 
   try {
     for (const config of matrix) {
       const context = await browser.newContext({
         viewport: { width: config.width, height: config.height },
-        reducedMotion: config.reducedMotion || 'no-preference'
+        reducedMotion: config.reducedMotion || 'no-preference',
+        forcedColors: config.forcedColors || 'none'
       });
       const page = await context.newPage();
       const observed = await observe(page);
@@ -107,6 +126,8 @@ async function observe(page) {
     const page = await context.newPage();
     const observed = await observe(page);
     await page.goto(`${base}/sport/`, { waitUntil: 'networkidle' });
+    check(await page.evaluate(() => Boolean(window.__DOMSE_SPORT_TEST__)), 'lokaler Test-Hook fehlt');
+    check(await page.evaluate(() => window.__DOMSE_SPORT_TEST__.formatElapsed(5700000)) === '01:35:00', 'Timer-Format 95 Minuten ist falsch');
     await page.locator('[data-timer="start"]').click();
     await page.waitForTimeout(1150);
     const running = await page.locator('#timer').textContent();
@@ -135,6 +156,9 @@ async function observe(page) {
     check(await page.locator('#doneCount').textContent() === '0/10', 'bestätigter Reset leerte den Stand nicht');
     check(!(await page.locator('#warmupCheck').isChecked()), 'bestätigter Reset leerte Warm-up nicht');
     check(await page.locator('#timer').textContent() === '00:00', 'Session-Reset leerte Timer nicht');
+    for (const checkbox of await page.locator('[data-done]').all()) await checkbox.check();
+    check((await page.locator('#sessionStatus').textContent()).includes('Training komplett'), 'Sessionabschluss wurde nicht angekündigt');
+    check(await page.locator('nav a', { hasText: 'E-Bike' }).getAttribute('href') === '/ebike/', 'E-Bike-Navigation ist falsch');
     check(observed.consoleErrors.length === 0 && observed.pageErrors.length === 0 && observed.failedRequests.length === 0, 'Interaktionslauf erzeugte Fehler');
     results.push({ viewport: 'interaction', actions: ['timer-start', 'timer-pause', 'timer-reset', 'toggle', 'reload', 'reset-cancel', 'reset-confirm'] });
     await context.close();
@@ -148,6 +172,17 @@ async function observe(page) {
     check(await legacyPage.evaluate(() => localStorage.getItem('domse-sport-done-v1')) === '{"goblet":true,"curl":true}', 'Legacy-Daten wurden verändert');
     results.push({ viewport: 'legacy', compatible: true });
     await legacyContext.close();
+
+    const migratedContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await migratedContext.addInitScript(() => {
+      localStorage.setItem('domse-sport-done-v1', JSON.stringify({ goblet: true }));
+      localStorage.setItem('domse-sport-legacy-migrated-v2', JSON.stringify({ version: 1, importedOn: 'earlier' }));
+    });
+    const migratedPage = await migratedContext.newPage();
+    await migratedPage.goto(`${base}/sport/`, { waitUntil: 'networkidle' });
+    check(!(await migratedPage.locator('[data-done="goblet"]').isChecked()), 'Legacy-Daten wurden erneut importiert');
+    results.push({ viewport: 'legacy-marker', importedOnce: true });
+    await migratedContext.close();
 
     const corruptContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await corruptContext.addInitScript((key) => localStorage.setItem(key, '{kaputt'), `domse-sport-session-v2:${localDate()}`);
@@ -176,6 +211,7 @@ async function observe(page) {
     console.log(JSON.stringify({ status: 'PASS', base, artifacts, checks: results }, null, 2));
   } finally {
     await browser.close();
+    if (server) server.kill('SIGTERM');
   }
 })().catch((error) => {
   console.error(`SPORT_PRODUCT_GATE_FAIL: ${error.message}`);

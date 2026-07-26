@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+node_modules/
 automation/n8n/.imported-workflow-id
 
 # Private E-Bike runtime data: exact home coordinates and personal tracks.

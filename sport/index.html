@@ -30,7 +30,7 @@
     <section class="hero shell" aria-labelledby="seitentitel">
       <div class="hero-copy">
         <p class="kicker">Hanteltraining zu Hause</p>
-        <h1 id="seitentitel">Ganzkörpertraining mit Kurzhanteln.</h1>
+        <h1 id="seitentitel">Krafttraining zu Hause.</h1>
         <p class="lead">Zehn Übungen für zwei bis drei Einheiten pro Woche. Kontrollierte Wiederholungen, Gewichte, die zur Tagesform passen, und genug Pause.</p>
         <div class="hero-links">
           <a class="button button-primary" href="#session">Heutige Session</a>
@@ -44,7 +44,7 @@
       </div>
       <figure class="hero-photo">
         <img src="/sport/assets/media/home-workout.jpg" width="1280" height="852" alt="Sportlerin hält beim Training zu Hause eine rote Kurzhantel" fetchpriority="high">
-        <figcaption>Redaktionelles Foto, keine Technik-Anleitung. „Home-Workout mit Kurzhantel“ · <a href="https://commons.wikimedia.org/wiki/File:Fitness_enthusiast_lifts_vibrant_dumbbell_during_home_workout.jpg" target="_blank" rel="noopener noreferrer">Shixart1985, CC BY 2.0</a></figcaption>
+        <figcaption>Redaktionelles Foto, keine Technik-Anleitung. „Home-Workout mit Kurzhantel“ · Foto: <a href="https://commons.wikimedia.org/wiki/File:Fitness_enthusiast_lifts_vibrant_dumbbell_during_home_workout.jpg" target="_blank" rel="noopener noreferrer">Nenad Stojković / Shixart1985</a> · <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a></figcaption>
       </figure>
     </section>
 
@@ -71,8 +71,9 @@
           <label><input id="formCheck" type="checkbox"> <span><strong>Technik vor Gewicht</strong><small>Sauber stoppen, bevor die Form kippt</small></span></label>
         </div>
         <div class="progress-panel">
-          <div><strong id="doneCount" aria-live="polite">0/10</strong><span>Übungen erledigt</span></div>
-          <progress id="progress" max="10" value="0">0 von 10</progress>
+          <div><strong id="doneCount" aria-live="polite">0/10</strong><span id="progressLabel">Übungen erledigt</span></div>
+          <progress id="progress" max="10" value="0" aria-labelledby="progressLabel">0 von 10</progress>
+          <p class="session-status" id="sessionStatus" aria-live="polite"></p>
           <button class="button button-quiet" id="resetSession" type="button">Heutige Session zurücksetzen</button>
         </div>
       </div>
@@ -96,6 +97,7 @@
         <p>Die Gewichte sind Startwerte. Die letzten Wiederholungen dürfen fordern, die Bewegung bleibt aber kontrolliert. Bei Schmerzen abbrechen und fachlichen Rat einholen.</p>
       </header>
       <div class="exercise-list">
+        <div class="block-divider"><span>Block A</span><strong>Grundbewegungen</strong><small>Beine, Rücken und Drücken</small></div>
         <article class="exercise-card" id="goblet">
           <div class="exercise-number">01</div><div class="exercise-copy"><p class="exercise-area">Beine · Po · Rumpf</p><h3>Goblet Squat</h3><p>Hantel vor der Brust halten. Die Knie folgen den Zehen; über den ganzen Fuß wieder aufstehen.</p><ul><li>Fersen am Boden</li><li>Rücken neutral</li><li>2–3 × 8–12 · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="goblet"><span>Heute erledigt</span></label>
         </article>
@@ -111,6 +113,7 @@
         <article class="exercise-card" id="lunge">
           <div class="exercise-number">05</div><div class="exercise-copy"><p class="exercise-area">Beine · Balance</p><h3>Reverse Lunge</h3><p>Einen Schritt rückwärts setzen. Der vordere Fuß bleibt vollständig belastet, der Oberkörper aufrecht.</p><ul><li>Erst Balance, dann Gewicht</li><li>Knie stabil führen</li><li>2–3 × 8–10 je Seite · 7,5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="lunge"><span>Heute erledigt</span></label>
         </article>
+        <div class="block-divider"><span>Block B</span><strong>Schultern und Arme</strong><small>Kontrolliert, ohne Schwung</small></div>
         <article class="exercise-card" id="ohp">
           <div class="exercise-number">06</div><div class="exercise-copy"><p class="exercise-area">Schultern · Trizeps</p><h3>Shoulder Press</h3><p>Aus Schulterhöhe über Kopf drücken. Bauch und Gesäß anspannen, damit die Rippen unten bleiben.</p><ul><li>Kein Hohlkreuz</li><li>Kontrolliert senken</li><li>2–3 × 8–10 · 7,5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="ohp"><span>Heute erledigt</span></label>
         </article>

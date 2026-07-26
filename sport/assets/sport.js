@@ -3,6 +3,8 @@
 (() => {
   const exerciseIds = ['goblet', 'rdl', 'row', 'press', 'lunge', 'ohp', 'latraise', 'curl', 'triceps', 'revfly'];
   const legacyKey = 'domse-sport-done-v1';
+  const legacyMigrationKey = 'domse-sport-legacy-migrated-v2';
+  const maxSessionMs = 24 * 60 * 60 * 1000;
   const localDate = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -10,12 +12,13 @@
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  const storageKey = `domse-sport-session-v2:${localDate()}`;
+  let sessionDate = localDate();
+  let storageKey = `domse-sport-session-v2:${sessionDate}`;
   let storageAvailable = true;
 
-  const emptyState = () => ({
+  const emptyState = (date = sessionDate) => ({
     version: 2,
-    date: localDate(),
+    date,
     done: {},
     warmup: false,
     form: false,
@@ -44,9 +47,9 @@
     }
   }
 
-  function normaliseState(candidate) {
-    const clean = emptyState();
-    if (!candidate || candidate.version !== 2 || candidate.date !== localDate()) return clean;
+  function normaliseState(candidate, date = sessionDate) {
+    const clean = emptyState(date);
+    if (!candidate || candidate.version !== 2 || candidate.date !== date) return clean;
     if (candidate.done && typeof candidate.done === 'object') {
       for (const id of exerciseIds) clean.done[id] = candidate.done[id] === true;
     }
@@ -54,23 +57,35 @@
     clean.form = candidate.form === true;
     const timer = candidate.timer;
     if (timer && Number.isFinite(timer.elapsedMs) && timer.elapsedMs >= 0) {
-      clean.timer.elapsedMs = Math.min(timer.elapsedMs, 24 * 60 * 60 * 1000);
+      clean.timer.elapsedMs = Math.min(timer.elapsedMs, maxSessionMs);
     }
-    if (timer && Number.isFinite(timer.runningSince) && timer.runningSince > 0 && timer.runningSince <= Date.now()) {
+    const dayStart = new Date(`${date}T00:00:00`).getTime();
+    const now = Date.now();
+    if (timer && Number.isFinite(timer.runningSince) && timer.runningSince >= dayStart && timer.runningSince <= now && now - timer.runningSince <= maxSessionMs) {
       clean.timer.runningSince = timer.runningSince;
     }
     return clean;
   }
 
-  const saved = safeRead(storageKey);
-  let state = normaliseState(saved);
-  if (!saved) {
-    const legacy = safeRead(legacyKey);
-    if (legacy) {
-      for (const id of exerciseIds) state.done[id] = legacy[id] === true;
+  function loadState(date, allowLegacyImport) {
+    storageKey = `domse-sport-session-v2:${date}`;
+    const saved = safeRead(storageKey);
+    const loaded = normaliseState(saved, date);
+    if (saved) return loaded;
+
+    const migration = safeRead(legacyMigrationKey);
+    if (allowLegacyImport && !migration) {
+      const legacy = safeRead(legacyKey);
+      if (legacy) {
+        for (const id of exerciseIds) loaded.done[id] = legacy[id] === true;
+      }
+      safeWrite(legacyMigrationKey, { version: 1, importedOn: date });
     }
-    safeWrite(storageKey, state);
+    safeWrite(storageKey, loaded);
+    return loaded;
   }
+
+  let state = loadState(sessionDate, true);
 
   const timerOutput = document.querySelector('#timer');
   const timerStatus = document.querySelector('#timerStatus');
@@ -81,11 +96,13 @@
   const storageStatus = document.querySelector('#storageStatus');
   const startButton = document.querySelector('[data-timer="start"]');
   const pauseButton = document.querySelector('[data-timer="pause"]');
+  const sessionStatus = document.querySelector('#sessionStatus');
   let timerHandle = null;
 
   function currentElapsed() {
-    if (state.timer.runningSince === null) return state.timer.elapsedMs;
-    return state.timer.elapsedMs + (Date.now() - state.timer.runningSince);
+    if (state.timer.runningSince === null) return Math.min(state.timer.elapsedMs, maxSessionMs);
+    const delta = Math.max(0, Math.min(Date.now() - state.timer.runningSince, maxSessionMs));
+    return Math.min(state.timer.elapsedMs + delta, maxSessionMs);
   }
 
   function formatElapsed(milliseconds) {
@@ -98,6 +115,7 @@
   }
 
   function drawTimer() {
+    if (ensureCurrentSession()) return;
     timerOutput.textContent = formatElapsed(currentElapsed());
   }
 
@@ -111,7 +129,19 @@
     timerHandle = null;
   }
 
+  function ensureCurrentSession() {
+    const today = localDate();
+    if (today === sessionDate) return false;
+    stopTicking();
+    sessionDate = today;
+    state = loadState(today, false);
+    applyState();
+    setTimerStatus('Neuer Kalendertag: eine frische Session ist bereit.');
+    return true;
+  }
+
   function persist() {
+    ensureCurrentSession();
     const stored = safeWrite(storageKey, state);
     if (storageStatus) {
       storageStatus.textContent = stored
@@ -133,6 +163,7 @@
   }
 
   function startTimer() {
+    ensureCurrentSession();
     if (state.timer.runningSince !== null) return;
     state.timer.runningSince = Date.now();
     persist();
@@ -142,8 +173,10 @@
   }
 
   function pauseTimer() {
+    ensureCurrentSession();
     if (state.timer.runningSince === null) return;
-    state.timer.elapsedMs += Date.now() - state.timer.runningSince;
+    const delta = Math.max(0, Math.min(Date.now() - state.timer.runningSince, maxSessionMs));
+    state.timer.elapsedMs = Math.min(state.timer.elapsedMs + delta, maxSessionMs);
     state.timer.runningSince = null;
     persist();
     stopTicking();
@@ -153,6 +186,7 @@
   }
 
   function resetTimer() {
+    ensureCurrentSession();
     stopTicking();
     state.timer = { elapsedMs: 0, runningSince: null };
     persist();
@@ -166,6 +200,7 @@
     doneCount.textContent = `${count}/10`;
     progress.value = count;
     progress.textContent = `${count} von 10`;
+    sessionStatus.textContent = count === exerciseIds.length ? 'Training komplett. Stark und sauber abgeschlossen.' : '';
   }
 
   function applyState() {
@@ -197,6 +232,7 @@
 
   document.querySelectorAll('[data-done]').forEach((input) => {
     input.addEventListener('change', () => {
+      ensureCurrentSession();
       state.done[input.dataset.done] = input.checked;
       persist();
       updateProgress();
@@ -204,20 +240,23 @@
   });
 
   warmupCheck.addEventListener('change', () => {
+    ensureCurrentSession();
     state.warmup = warmupCheck.checked;
     persist();
   });
 
   formCheck.addEventListener('change', () => {
+    ensureCurrentSession();
     state.form = formCheck.checked;
     persist();
   });
 
   document.querySelector('#resetSession').addEventListener('click', () => {
+    ensureCurrentSession();
     const confirmed = window.confirm('Heutige Häkchen und Timer wirklich zurücksetzen?');
     if (!confirmed) return;
     stopTicking();
-    state = emptyState();
+    state = emptyState(sessionDate);
     persist();
     applyState();
     setTimerStatus('Heutige Session zurückgesetzt.');
@@ -226,7 +265,17 @@
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) drawTimer();
   });
+  window.addEventListener('storage', (event) => {
+    if (event.key !== storageKey) return;
+    state = normaliseState(safeRead(storageKey), sessionDate);
+    applyState();
+    setTimerStatus('Trainingsstand aus einem anderen Tab aktualisiert.');
+  });
   window.addEventListener('pagehide', persist);
+
+  if (['127.0.0.1', 'localhost'].includes(window.location.hostname)) {
+    window.__DOMSE_SPORT_TEST__ = Object.freeze({ formatElapsed, normaliseState, localDate });
+  }
 
   applyState();
 })();

@@ -16,12 +16,11 @@ html { min-width: 320px; scroll-behavior: smooth; }
 body {
   margin: 0;
   min-width: 320px;
-  overflow-x: hidden;
   color: var(--ink);
   background: var(--paper);
   font: 1rem/1.62 Georgia, "Times New Roman", serif;
-  overflow-wrap: anywhere;
 }
+p, li, figcaption, small { overflow-wrap: anywhere; }
 button, input { font: inherit; }
 a { color: inherit; text-underline-offset: .2em; }
 img { display: block; max-width: 100%; height: auto; }
@@ -68,8 +67,10 @@ img { display: block; max-width: 100%; height: auto; }
 .site-header nav a[aria-current="page"] { color: var(--white); background: var(--forest); border-radius: 99rem; }
 
 .hero { display: grid; grid-template-columns: minmax(0, .9fr) minmax(24rem, 1.1fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; padding-block: clamp(3.5rem, 9vw, 8rem); }
+.hero > *, .session-grid > *, .section-heading > *, .exercise-card > *, .block-divider > * { min-width: 0; }
 .kicker, .label, .exercise-area { margin: 0 0 .8rem; color: var(--rust); font: 750 .72rem/1.3 system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
 h1, h2, h3 { margin-top: 0; font-weight: 500; line-height: 1.02; letter-spacing: -.035em; }
+h1 { overflow-wrap: normal; word-break: normal; }
 h1 { margin-bottom: 1.6rem; font-size: clamp(3rem, 6.2vw, 6.3rem); }
 h2 { margin-bottom: 1rem; font-size: clamp(2rem, 4vw, 3.7rem); }
 h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
@@ -126,6 +127,7 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
 .progress-panel > div strong { font-size: 2rem; line-height: 1; }
 .progress-panel > div span { color: #aebdb5; font: .7rem/1.4 system-ui, sans-serif; }
 .progress-panel progress { width: 100%; height: .6rem; accent-color: #d89173; }
+.session-status { grid-column: 1 / -1; min-height: 1.4rem; margin: 0; color: #d7dfda; font: 700 .76rem/1.4 system-ui, sans-serif; }
 .progress-panel .button { grid-column: 1 / -1; justify-self: start; }
 
 .plan-note { display: grid; grid-template-columns: .75fr 1.25fr; gap: 4rem; padding-block: clamp(4rem, 8vw, 7rem); border-bottom: 1px solid var(--line); }
@@ -139,6 +141,11 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
 .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: end; margin-bottom: 3rem; }
 .section-heading > p { max-width: 38rem; margin: 0; color: var(--muted); }
 .exercise-list { border-top: 1px solid var(--ink); }
+.block-divider { display: grid; grid-template-columns: 4rem minmax(0, 1fr) 10rem; gap: clamp(1rem, 4vw, 4rem); align-items: baseline; padding: 1rem 0; border-bottom: 1px solid var(--line); color: var(--forest); font-family: system-ui, sans-serif; }
+.block-divider span, .block-divider strong, .block-divider small { overflow-wrap: anywhere; }
+.block-divider span { color: var(--rust); font-size: .72rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.block-divider strong { font-size: .88rem; }
+.block-divider small { color: var(--muted); font-size: .72rem; }
 .exercise-card { display: grid; grid-template-columns: 4rem minmax(0, 1fr) 10rem; gap: clamp(1rem, 4vw, 4rem); padding: 2.2rem 0; border-bottom: 1px solid var(--line); }
 .exercise-number { padding-top: .25rem; color: var(--rust); font: 700 .75rem/1 system-ui, sans-serif; }
 .exercise-copy { max-width: 46rem; }
@@ -166,6 +173,8 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
   .session-grid, .plan-note, .section-heading { grid-template-columns: 1fr; }
   .session-intro { padding-right: 0; }
   .exercise-card { grid-template-columns: 2.4rem minmax(0, 1fr); }
+  .block-divider { grid-template-columns: 2.4rem minmax(0, 1fr); }
+  .block-divider small { grid-column: 2; }
   .done-row { grid-column: 2; justify-content: flex-start; }
 }
 
@@ -177,7 +186,7 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
   .brand small { display: none; }
   .brand-mark { width: 2.4rem; height: 2.4rem; }
   .hero { padding-block: 3rem 4rem; }
-  h1 { font-size: clamp(2.65rem, 14vw, 4rem); }
+  h1 { font-size: min(13vw, 4rem); }
   .quick-facts { grid-template-columns: 1fr; gap: .7rem; }
   .quick-facts div { display: flex; justify-content: space-between; gap: 1rem; }
   .quick-facts dd { margin: 0; }
@@ -189,6 +198,8 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
   .progress-panel { grid-template-columns: 1fr; }
   .progress-panel .button { grid-column: auto; width: 100%; }
   .exercise-card { grid-template-columns: 2rem minmax(0, 1fr); gap: .75rem; padding-block: 1.7rem; }
+  .block-divider { grid-template-columns: 1fr; gap: .2rem; padding-block: 1rem; }
+  .block-divider span, .block-divider strong, .block-divider small { grid-column: 1; }
   .exercise-copy ul { display: grid; gap: .3rem; }
   .exercise-copy li::after { display: none; }
   .notes-grid { grid-template-columns: 1fr; }
@@ -203,4 +214,11 @@ h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.5vw, 2.15rem); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+
+@media (forced-colors: active) {
+  :focus-visible { outline: 3px solid Highlight; }
+  .button, .site-header nav a[aria-current="page"], .exercise-card, .notes-grid article { border: 1px solid ButtonText; forced-color-adjust: auto; }
+  .session-band { border-block: 1px solid CanvasText; }
+  .session-checks input, .done-row input { accent-color: Highlight; }
 }
