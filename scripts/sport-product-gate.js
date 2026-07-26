@@ -141,8 +141,10 @@ async function observe(page) {
     check(new URL(page.url()).hash === '#inhalt', 'Skip-Link springt nicht zum Hauptinhalt');
     await page.keyboard.press('Tab');
     check(await page.locator('a[href="#session"]').evaluate((element) => document.activeElement === element), 'Fokusreihenfolge nach Skip-Link ist falsch');
-    check(await page.evaluate(() => Boolean(window.__DOMSE_SPORT_TEST__)), 'lokaler Test-Hook fehlt');
-    check(await page.evaluate(() => window.__DOMSE_SPORT_TEST__.formatElapsed(5700000)) === '01:35:00', 'Timer-Format 95 Minuten ist falsch');
+    if (!publicTarget) {
+      check(await page.evaluate(() => Boolean(window.__DOMSE_SPORT_TEST__)), 'lokaler Test-Hook fehlt');
+      check(await page.evaluate(() => window.__DOMSE_SPORT_TEST__.formatElapsed(5700000)) === '01:35:00', 'Timer-Format 95 Minuten ist falsch');
+    }
     await page.locator('[data-timer="start"]').click();
     await page.waitForTimeout(1150);
     const running = await page.locator('#timer').textContent();
