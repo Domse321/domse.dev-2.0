@@ -8,6 +8,7 @@ const { spawn } = require('node:child_process');
 
 const base = (process.env.SPORT_BASE_URL || 'http://127.0.0.1:18778').replace(/\/$/, '');
 const autoServe = !process.env.SPORT_BASE_URL;
+const publicTarget = process.env.SPORT_PUBLIC_TARGET === '1';
 const artifacts = process.env.SPORT_ARTIFACTS || '/tmp/domse-sport-gate';
 fs.mkdirSync(artifacts, { recursive: true });
 
@@ -46,6 +47,14 @@ async function observe(page) {
     ? spawn('python3', ['-m', 'http.server', '18778', '--bind', '127.0.0.1'], { cwd: path.resolve(__dirname, '..'), stdio: 'ignore' })
     : null;
   if (server) await waitForServer(base);
+  if (publicTarget) {
+    const response = await fetch(`${base}/sport/`);
+    const csp = response.headers.get('content-security-policy') || '';
+    const frameOptions = response.headers.get('x-frame-options') || '';
+    check(response.ok, `öffentliche Sportseite antwortet mit HTTP ${response.status}`);
+    check(csp.includes("frame-ancestors 'none'") || frameOptions.toUpperCase() === 'DENY', 'produktiver Framing-Schutz fehlt');
+    check((response.headers.get('x-content-type-options') || '').toLowerCase() === 'nosniff', 'produktiver nosniff-Header fehlt');
+  }
   const browser = await chromium.launch({ headless: true });
   const results = [];
   const matrix = [
@@ -126,6 +135,12 @@ async function observe(page) {
     const page = await context.newPage();
     const observed = await observe(page);
     await page.goto(`${base}/sport/`, { waitUntil: 'networkidle' });
+    await page.keyboard.press('Tab');
+    check(await page.locator('.skip-link').evaluate((element) => document.activeElement === element), 'Skip-Link erhält nicht den ersten Tastaturfokus');
+    await page.keyboard.press('Enter');
+    check(new URL(page.url()).hash === '#inhalt', 'Skip-Link springt nicht zum Hauptinhalt');
+    await page.keyboard.press('Tab');
+    check(await page.locator('a[href="#session"]').evaluate((element) => document.activeElement === element), 'Fokusreihenfolge nach Skip-Link ist falsch');
     check(await page.evaluate(() => Boolean(window.__DOMSE_SPORT_TEST__)), 'lokaler Test-Hook fehlt');
     check(await page.evaluate(() => window.__DOMSE_SPORT_TEST__.formatElapsed(5700000)) === '01:35:00', 'Timer-Format 95 Minuten ist falsch');
     await page.locator('[data-timer="start"]').click();
@@ -183,6 +198,25 @@ async function observe(page) {
     check(!(await migratedPage.locator('[data-done="goblet"]').isChecked()), 'Legacy-Daten wurden erneut importiert');
     results.push({ viewport: 'legacy-marker', importedOnce: true });
     await migratedContext.close();
+
+    const midnightContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await midnightContext.addInitScript(() => {
+      const NativeDate = Date;
+      window.__fakeNow = new NativeDate(2026, 6, 26, 23, 59, 59).getTime();
+      class TestDate extends NativeDate {
+        constructor(...args) { super(...(args.length ? args : [window.__fakeNow])); }
+        static now() { return window.__fakeNow; }
+      }
+      window.Date = TestDate;
+    });
+    const midnightPage = await midnightContext.newPage();
+    await midnightPage.goto(`${base}/sport/`, { waitUntil: 'networkidle' });
+    await midnightPage.evaluate(() => { window.__fakeNow = new Date(2026, 6, 27, 0, 0, 1).getTime(); });
+    await midnightPage.locator('[data-done="goblet"]').check();
+    check(await midnightPage.locator('[data-done="goblet"]').isChecked(), 'Aktion beim Kalendertagswechsel ging verloren');
+    check(await midnightPage.evaluate(() => JSON.parse(localStorage.getItem('domse-sport-session-v2:2026-07-27')).done.goblet) === true, 'neuer Tageszustand speichert die auslösende Aktion nicht');
+    results.push({ viewport: 'midnight-rollover', actionPreserved: true });
+    await midnightContext.close();
 
     const corruptContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await corruptContext.addInitScript((key) => localStorage.setItem(key, '{kaputt'), `domse-sport-session-v2:${localDate()}`);

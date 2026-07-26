@@ -232,22 +232,28 @@
 
   document.querySelectorAll('[data-done]').forEach((input) => {
     input.addEventListener('change', () => {
+      const checked = input.checked;
       ensureCurrentSession();
-      state.done[input.dataset.done] = input.checked;
+      input.checked = checked;
+      state.done[input.dataset.done] = checked;
       persist();
       updateProgress();
     });
   });
 
   warmupCheck.addEventListener('change', () => {
+    const checked = warmupCheck.checked;
     ensureCurrentSession();
-    state.warmup = warmupCheck.checked;
+    warmupCheck.checked = checked;
+    state.warmup = checked;
     persist();
   });
 
   formCheck.addEventListener('change', () => {
+    const checked = formCheck.checked;
     ensureCurrentSession();
-    state.form = formCheck.checked;
+    formCheck.checked = checked;
+    state.form = checked;
     persist();
   });
 

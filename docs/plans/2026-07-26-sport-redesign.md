@@ -101,7 +101,7 @@
 1. Spec-, Codequalität-, Security-, Accessibility- und Visual-Reviews auf dem exakten Candidate-SHA ausführen.
 2. Produktionsstand und alte Sportassets auf CT108 sichern.
 3. Branch nach `main` integrieren und pushen.
-4. Offiziellen `domse-dev-deploy.service` verwenden.
-5. Live-Funktionsgate und visuelle Matrix gegen `https://domse.dev/sport/` ausführen.
+4. Offiziellen `domse-dev-deploy.service` verwenden und am produktiven Server/Proxy `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` sowie `X-Content-Type-Options: nosniff` setzen.
+5. Live-Funktionsgate und visuelle Matrix gegen `https://domse.dev/sport/` mit `SPORT_PUBLIC_TARGET=1` ausführen; das Gate muss ohne diese Header fail-closed abbrechen.
 6. Produktive Datei-Hashes, HTTP-Status, CSP, Timer/Storage, Bildpixel, Attribution und Mobile-Reflow prüfen.
 7. Rollbackpfad dokumentieren und Deploymenttimer aktiv bestätigen.
