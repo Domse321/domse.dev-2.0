@@ -4,144 +4,140 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="index, follow">
-  <meta name="description" content="Domse Dumbbell Trainingsplan: 10 Übungen, 3 Gewichtsstufen, Timer, Progression und Übungsbilder.">
-  <meta name="theme-color" content="#100d08">
-  <title>Domse Sportplan — Dumbbell Routine</title>
-  <link rel="stylesheet" href="/sport/assets/sport.css?v=20260601-header-01">
-  <script src="/sport/assets/sport.js?v=20260601-header-01" defer></script>
+  <meta name="description" content="Ein persönliches Hantel-Trainingstagebuch mit zehn Übungen, Session-Timer und lokalem Tagesfortschritt.">
+  <meta name="theme-color" content="#f3efe6">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; font-src 'self'; media-src 'none'; upgrade-insecure-requests">
+  <link rel="canonical" href="https://domse.dev/sport/">
+  <title>Domse Sport — Hanteltraining zu Hause</title>
+  <link rel="stylesheet" href="/sport/assets/sport.css">
+  <script src="/sport/assets/sport.js" defer></script>
 </head>
 <body>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
-
-  <header class="site-header tool-header sport-header">
+  <a class="skip-link" href="#inhalt">Zum Inhalt</a>
+  <header class="site-header">
     <a class="brand" href="/" aria-label="Zur domse.dev Startseite">
-      <span class="brand-mark">D</span>
-      <span><strong>Domse Sportplan</strong><small>Dumbbells · Training · Fortschritt</small></span>
+      <span class="brand-mark" aria-hidden="true">D</span>
+      <span><strong>Domse Sport</strong><small>Persönliches Trainingstagebuch</small></span>
     </a>
-    <nav aria-label="Hauptnavigation"><a class="nav-pill" href="/ebike/">E-Bike</a><a class="nav-pill active" href="/sport/">Sport</a></nav>
+    <nav aria-label="Hauptnavigation">
+      <a href="/ebike/">E-Bike</a>
+      <a href="/sport/" aria-current="page">Sport</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="hero shell">
-      <div class="hero-copy reveal">
-        <p class="eyebrow">Aktiver Trainingsplan · Version 2026-05-17</p>
-        <h1>Zwei Hanteln. Zehn Übungen. Ein klarer Plan für Zuhause.</h1>
-        <p class="lead">Ein strukturierter Full-Body-Plan für Zuhause: 2–3× pro Woche, mit 10 kg, 7,5 kg und 5 kg als praktische Gewichtsstufen. Fokus: saubere Technik, nachvollziehbarer Fortschritt und ein Ablauf, der langfristig realistisch bleibt.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="#start">Training starten</a>
-          <a class="button ghost" href="#uebungen">Übungen ansehen</a>
+  <main id="inhalt">
+    <section class="hero shell" aria-labelledby="seitentitel">
+      <div class="hero-copy">
+        <p class="kicker">Hanteltraining zu Hause</p>
+        <h1 id="seitentitel">Ganzkörpertraining mit Kurzhanteln.</h1>
+        <p class="lead">Zehn Übungen für zwei bis drei Einheiten pro Woche. Kontrollierte Wiederholungen, Gewichte, die zur Tagesform passen, und genug Pause.</p>
+        <div class="hero-links">
+          <a class="button button-primary" href="#session">Heutige Session</a>
+          <a class="text-link" href="#uebungen">Zum Trainingsplan <span aria-hidden="true">↓</span></a>
+        </div>
+        <dl class="quick-facts">
+          <div><dt>Umfang</dt><dd>10 Übungen</dd></div>
+          <div><dt>Dauer</dt><dd>35–50 Minuten</dd></div>
+          <div><dt>Pause</dt><dd>60–90 Sekunden</dd></div>
+        </dl>
+      </div>
+      <figure class="hero-photo">
+        <img src="/sport/assets/media/home-workout.jpg" width="1280" height="852" alt="Sportlerin hält beim Training zu Hause eine rote Kurzhantel" fetchpriority="high">
+        <figcaption>Redaktionelles Foto, keine Technik-Anleitung. „Home-Workout mit Kurzhantel“ · <a href="https://commons.wikimedia.org/wiki/File:Fitness_enthusiast_lifts_vibrant_dumbbell_during_home_workout.jpg" target="_blank" rel="noopener noreferrer">Shixart1985, CC BY 2.0</a></figcaption>
+      </figure>
+    </section>
+
+    <section class="session-band" id="session" aria-labelledby="session-title">
+      <div class="shell session-grid">
+        <div class="session-intro">
+          <p class="kicker">Heute</p>
+          <h2 id="session-title">Die Session im Blick</h2>
+          <p>Der Stand bleibt für diesen Kalendertag lokal in diesem Browser gespeichert. Vorhandene Häkchen aus der alten Version werden einmalig übernommen; die alten Daten bleiben erhalten.</p>
+          <p class="storage-status" id="storageStatus" aria-live="polite">Dein Trainingsstand wird nur in diesem Browser gespeichert.</p>
+        </div>
+        <div class="timer-panel" aria-label="Session-Timer">
+          <p class="label">Trainingszeit</p>
+          <output class="timer" id="timer" aria-live="off">00:00</output>
+          <div class="timer-controls">
+            <button class="button button-primary" type="button" data-timer="start">Start</button>
+            <button class="button" type="button" data-timer="pause">Pause</button>
+            <button class="button button-quiet" type="button" data-timer="reset">Timer zurücksetzen</button>
+          </div>
+          <p class="timer-status" id="timerStatus" aria-live="polite">Timer bereit.</p>
+        </div>
+        <div class="session-checks">
+          <label><input id="warmupCheck" type="checkbox"> <span><strong>Warm-up erledigt</strong><small>5–7 Minuten mobilisieren</small></span></label>
+          <label><input id="formCheck" type="checkbox"> <span><strong>Technik vor Gewicht</strong><small>Sauber stoppen, bevor die Form kippt</small></span></label>
+        </div>
+        <div class="progress-panel">
+          <div><strong id="doneCount" aria-live="polite">0/10</strong><span>Übungen erledigt</span></div>
+          <progress id="progress" max="10" value="0">0 von 10</progress>
+          <button class="button button-quiet" id="resetSession" type="button">Heutige Session zurücksetzen</button>
         </div>
       </div>
-      <aside class="command-card reveal delay-1" aria-label="Trainingskurzfassung">
-        <div class="status"><span></span> Plan bereit</div>
-        <div class="stat-grid">
-          <div><strong>10</strong><small>Übungen</small></div>
-          <div><strong>35–50</strong><small>Minuten</small></div>
-          <div><strong>2–3×</strong><small>pro Woche</small></div>
-        </div>
-        <div class="weight-ledger">
-          <p><b>10 kg</b> Hauptgewicht</p>
-          <p><b>7,5 kg</b> Technik-/Mittelstufe</p>
-          <p><b>5 kg</b> Schulter-Isolation</p>
-        </div>
-      </aside>
     </section>
 
-    <section id="routine" class="shell routine-grid">
-      <article class="panel reveal">
-        <p class="eyebrow">Trainingswoche</p>
-        <h2>Der Ablauf</h2>
-        <ol class="timeline">
-          <li><span>01</span><div><b>Warm-up — 5–7 Min</b><p>Armkreisen, Hüftkreisen, Bodyweight Squats, leichte Rows ohne Reißen.</p></div></li>
-          <li><span>02</span><div><b>Hauptteil — 10 Übungen</b><p>Woche 1–2: 2 Sätze. Ab Woche 3: 3 Sätze. 60–90 Sekunden Pause.</p></div></li>
-          <li><span>03</span><div><b>Progression</b><p>Wenn 12 Wiederholungen sauber gehen: erst mehr Sätze/Reps, dann Gewicht erhöhen.</p></div></li>
-          <li><span>04</span><div><b>Ruhetag</b><p>Mindestens ein Tag Pause zwischen Krafttrainings. Montag/Mittwoch/Freitag ist ideal.</p></div></li>
-        </ol>
-      </article>
-      <article id="start" class="panel workout-console reveal delay-1">
-        <p class="eyebrow">Heute trainieren</p>
-        <h2>Session-Timer</h2>
-        <div class="timer" id="timer">00:00</div>
-        <div class="timer-controls">
-          <button class="button primary" data-timer="start">Start</button>
-          <button class="button ghost" data-timer="pause">Pause</button>
-          <button class="button ghost" data-timer="reset">Reset</button>
-        </div>
-        <label class="checkline"><input id="warmupCheck" type="checkbox"> Warm-up erledigt</label>
-        <label class="checkline"><input id="formCheck" type="checkbox"> Heute zählt saubere Form, nicht Ego</label>
-      </article>
-    </section>
-
-    <section class="shell overview reveal">
+    <section class="shell plan-note" aria-labelledby="ablauf-title">
       <div>
-        <p class="eyebrow">Alles auf einen Blick</p>
-        <h2>Übungsübersicht</h2>
+        <p class="kicker">Ablauf</p>
+        <h2 id="ablauf-title">Ein Plan, der Platz für Alltag lässt.</h2>
       </div>
-      <img src="/sport/assets/exercises/00-overview.png" alt="Gesamtübersicht des Domse Dumbbell Trainingsplans">
+      <ol>
+        <li><span>01</span><p><strong>Aufwärmen</strong>Armkreisen, Hüftmobilität, Kniebeugen ohne Gewicht und leichte Rows.</p></li>
+        <li><span>02</span><p><strong>Hauptteil</strong>In Woche 1–2 zwei Sätze, danach drei. Zwischen den Sätzen ruhig atmen.</p></li>
+        <li><span>03</span><p><strong>Steigern</strong>Erst Wiederholungen und Sätze sicher beherrschen, dann das Gewicht erhöhen.</p></li>
+      </ol>
     </section>
 
-    <section id="uebungen" class="shell exercises-section">
-      <div class="section-heading reveal">
-        <p class="eyebrow">Trainingsübersicht</p>
-        <h2>Die 10 Übungen</h2>
-        <p>Die Gewichte sind Startwerte. Ideal ist ein Gewicht, bei dem die letzten 2–3 Wiederholungen fordernd sind, aber technisch sauber bleiben.</p>
+    <section class="shell exercises-section" id="uebungen" aria-labelledby="uebungen-title">
+      <header class="section-heading">
+        <div><p class="kicker">Trainingsplan</p><h2 id="uebungen-title">Die zehn Übungen</h2></div>
+        <p>Die Gewichte sind Startwerte. Die letzten Wiederholungen dürfen fordern, die Bewegung bleibt aber kontrolliert. Bei Schmerzen abbrechen und fachlichen Rat einholen.</p>
+      </header>
+      <div class="exercise-list">
+        <article class="exercise-card" id="goblet">
+          <div class="exercise-number">01</div><div class="exercise-copy"><p class="exercise-area">Beine · Po · Rumpf</p><h3>Goblet Squat</h3><p>Hantel vor der Brust halten. Die Knie folgen den Zehen; über den ganzen Fuß wieder aufstehen.</p><ul><li>Fersen am Boden</li><li>Rücken neutral</li><li>2–3 × 8–12 · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="goblet"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="rdl">
+          <div class="exercise-number">02</div><div class="exercise-copy"><p class="exercise-area">Hintere Kette</p><h3>Romanian Deadlift</h3><p>Die Hüfte nach hinten schieben und die Hanteln dicht an den Beinen führen. Nur so tief gehen, wie der Rücken neutral bleibt.</p><ul><li>Knie leicht gebeugt</li><li>Bewegung aus der Hüfte</li><li>2–3 × 8–12 · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="rdl"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="row">
+          <div class="exercise-number">03</div><div class="exercise-copy"><p class="exercise-area">Rücken · Lat</p><h3>One-Arm Row</h3><p>Stabil abstützen und den Ellbogen ohne Schwung Richtung Hüfte ziehen. Die Hantel langsam ablassen.</p><ul><li>Hals lang</li><li>Schulterblatt bewegt sich mit</li><li>2–3 × 8–12 je Seite · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="row"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="press">
+          <div class="exercise-number">04</div><div class="exercise-copy"><p class="exercise-area">Brust · Trizeps</p><h3>Floor Press</h3><p>Auf dem Rücken liegend drücken. Die Oberarme berühren kontrolliert den Boden, bevor die nächste Wiederholung beginnt.</p><ul><li>Handgelenke stabil</li><li>Ellbogen etwa 45 Grad</li><li>2–3 × 8–12 · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="press"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="lunge">
+          <div class="exercise-number">05</div><div class="exercise-copy"><p class="exercise-area">Beine · Balance</p><h3>Reverse Lunge</h3><p>Einen Schritt rückwärts setzen. Der vordere Fuß bleibt vollständig belastet, der Oberkörper aufrecht.</p><ul><li>Erst Balance, dann Gewicht</li><li>Knie stabil führen</li><li>2–3 × 8–10 je Seite · 7,5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="lunge"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="ohp">
+          <div class="exercise-number">06</div><div class="exercise-copy"><p class="exercise-area">Schultern · Trizeps</p><h3>Shoulder Press</h3><p>Aus Schulterhöhe über Kopf drücken. Bauch und Gesäß anspannen, damit die Rippen unten bleiben.</p><ul><li>Kein Hohlkreuz</li><li>Kontrolliert senken</li><li>2–3 × 8–10 · 7,5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="ohp"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="latraise">
+          <div class="exercise-number">07</div><div class="exercise-copy"><p class="exercise-area">Seitliche Schulter</p><h3>Lateral Raise</h3><p>Die Arme mit leichter Ellbogenbeuge bis ungefähr Schulterhöhe heben. Ohne Schwung langsam ablassen.</p><ul><li>Schultern tief lassen</li><li>Leichtes Gewicht wählen</li><li>2–3 × 10–15 · 5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="latraise"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="curl">
+          <div class="exercise-number">08</div><div class="exercise-copy"><p class="exercise-area">Bizeps</p><h3>Biceps Curl</h3><p>Die Oberarme ruhig am Körper halten und aus dem Ellbogen beugen. Kein Schwung aus Hüfte oder Rücken.</p><ul><li>Handflächen drehen nach oben</li><li>Oben kurz halten</li><li>2–3 × 8–12 · 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="curl"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="triceps">
+          <div class="exercise-number">09</div><div class="exercise-copy"><p class="exercise-area">Trizeps</p><h3>Overhead Triceps Extension</h3><p>Eine Hantel mit beiden Händen hinter den Kopf senken und strecken. Die Ellbogen bleiben möglichst eng.</p><ul><li>Rippen unten</li><li>Ruhige Bewegung</li><li>2–3 × 10–12 · 1 Hantel, 10 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="triceps"><span>Heute erledigt</span></label>
+        </article>
+        <article class="exercise-card" id="revfly">
+          <div class="exercise-number">10</div><div class="exercise-copy"><p class="exercise-area">Hintere Schulter · oberer Rücken</p><h3>Reverse Fly</h3><p>Mit geradem Rücken nach vorn neigen und die Arme kontrolliert zur Seite öffnen. Der Nacken bleibt locker.</p><ul><li>Kein Schwung</li><li>Schulterblätter führen</li><li>2–3 × 10–15 · 5 kg</li></ul></div><label class="done-row"><input type="checkbox" data-done="revfly"><span>Heute erledigt</span></label>
+        </article>
       </div>
-      <div class="exercise-grid" id="exerciseGrid"></div>
     </section>
 
-    <section id="tracker" class="shell tracker-section">
-      <div class="section-heading reveal">
-        <p class="eyebrow">Lokaler Fortschritt</p>
-        <h2>Training abhaken</h2>
-        <p>Speichert nur lokal in deinem Browser per localStorage. Kein Account, keine externe Speicherung.</p>
-      </div>
-      <div class="tracker-card reveal delay-1">
-        <div>
-          <strong id="doneCount">0/10</strong>
-          <span>Übungen erledigt</span>
-        </div>
-        <progress id="progress" max="10" value="0"></progress>
-        <button class="button ghost" id="resetChecks">Häkchen zurücksetzen</button>
-      </div>
-    </section>
-
-    <section id="setup" class="shell setup-grid">
-      <article class="panel reveal">
-        <p class="eyebrow">Gewichtsstufen</p>
-        <h2>So stellst du ein</h2>
-        <ul class="bullet-list">
-          <li><b>10 kg:</b> Goblet Squat, RDL, Row, Floor Press, Curl, Trizeps.</li>
-          <li><b>7,5 kg:</b> Reverse Lunge und Shoulder Press als ehrliche Technikstufe.</li>
-          <li><b>5 kg:</b> Lateral Raise und Reverse Fly. Hier zählt kontrollierte Ausführung mehr als hohes Gewicht.</li>
-        </ul>
-      </article>
-      <article class="panel reveal delay-1">
-        <p class="eyebrow">Boden & Ablage</p>
-        <h2>Billige Hantel-Parkzone</h2>
-        <ul class="bullet-list">
-          <li>60×60×1 cm Bautenschutz-/Antivibrationsmatte aus Gummigranulat.</li>
-          <li>2 Gummi-Türstopper oder Holzleisten als Rollbremse.</li>
-          <li>Trainingsmatte separat: 10–15 mm NBR, nicht als Ablage für Hanteln verwenden.</li>
-        </ul>
-      </article>
-    </section>
-
-    <section class="shell sources reveal">
-      <p class="eyebrow">Quellenbasis</p>
-      <h2>Warum der Plan so aufgebaut ist</h2>
-      <p>Die Struktur orientiert sich an bewährten Full-Body-Dumbbell-Prinzipien: große Grundbewegungen zuerst, Push/Pull/Beine/Core abgedeckt, 8–12 Wiederholungen, 2–3 Einheiten pro Woche und Steigerung nur bei sauberer Technik.</p>
-      <div class="source-links">
-        <a href="https://www.acefitness.org/resources/pros/expert-articles/3718/total-body-dumbbell-workout/" target="_blank" rel="noopener noreferrer">ACE Dumbbell Workout</a>
-        <a href="https://www.muscleandstrength.com/workouts/3-day-full-body-dumbbell-workout" target="_blank" rel="noopener noreferrer">Muscle&Strength 3-Day</a>
-        <a href="https://www.nerdfitness.com/blog/beginner-dumbbell-workout/" target="_blank" rel="noopener noreferrer">Nerd Fitness Beginner</a>
-        <a href="https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/weight-training/art-20045842" target="_blank" rel="noopener noreferrer">Mayo Clinic Technik</a>
-      </div>
+    <section class="shell notes-grid" aria-label="Notizen zum Training">
+      <article><p class="kicker">Gewichte</p><h2>Drei ehrliche Stufen</h2><p><strong>10 kg</strong> für Squat, RDL, Row, Floor Press, Curl und Trizeps. <strong>7,5 kg</strong> für Lunge und Shoulder Press. <strong>5 kg</strong> für Raises und Reverse Fly.</p></article>
+      <article><p class="kicker">Regeneration</p><h2>Pause gehört dazu</h2><p>Mindestens ein freier Tag zwischen zwei Kraft-Einheiten. Schlaf, Essen und ein kurzer Spaziergang zählen mehr als eine erzwungene Zusatzrunde.</p></article>
     </section>
   </main>
 
-  <footer class="footer shell">
-    <span>Domse Sportplan</span>
+  <footer class="site-footer shell">
+    <p><strong>Domse Sport</strong><br>Persönlicher Plan, lokal im Browser geführt.</p>
+    <p>Trainingsstruktur nach allgemeinen Empfehlungen zum Krafttraining. Kein Ersatz für medizinische Beratung.</p>
   </footer>
 </body>
 </html>

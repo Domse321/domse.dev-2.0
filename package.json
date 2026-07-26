@@ -2,8 +2,10 @@
   "name": "domse-dev",
   "private": true,
   "scripts": {
-    "test": "node --test ebike/tests/js/*.test.js tests/*.test.js",
+    "test": "node --test ebike/tests/js/*.test.js tests/*.test.js sport/tests/*.test.js",
     "test:landing": "node --test tests/*.test.js && python3 scripts/validate-landing.py",
+    "test:sport": "node --test sport/tests/*.test.js && python3 scripts/validate-sport.py",
+    "gate:sport": "node scripts/sport-product-gate.js",
     "test:python": "/usr/bin/python3 -m unittest discover -s ebike/tests -p 'test_*.py' -v",
     "test:n8n": "/usr/bin/python3 -m unittest discover -s automation/n8n/tests -p 'test_*.py' -v",
     "test:all": "npm test && npm run test:python && npm run test:n8n && python3 scripts/validate-landing.py"

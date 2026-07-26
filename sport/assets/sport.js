@@ -1,72 +1,232 @@
-const exercises = [
-  {id:'goblet', n:1, title:'Goblet Squat', img:'01-goblet-squat.png', weight:'10 kg', cls:'kg10', sets:'2–3 × 8–12', area:'Beine · Po · Core', cue:'Hantel vor der Brust, Brust hoch, Knie folgen den Zehen. Unten kurz kontrollieren, dann über den ganzen Fuß hochdrücken.', form:['Fersen bleiben am Boden','Rücken neutral','Nicht in die Knie fallen']},
-  {id:'rdl', n:2, title:'Romanian Deadlift', img:'02-romanian-deadlift.png', weight:'10 kg', cls:'kg10', sets:'2–3 × 8–12', area:'Hintere Kette', cue:'Hüfte nach hinten schieben, Hanteln nah am Bein führen und den Rücken durchgehend neutral halten.', form:['Knie leicht gebeugt','Bewegung aus der Hüfte','Stoppen, bevor der Rücken rund wird']},
-  {id:'row', n:3, title:'One-Arm Row', img:'03-one-arm-row.png', weight:'10 kg', cls:'kg10', sets:'2–3 × 8–12/Seite', area:'Rücken · Lat', cue:'Abstützen, Rücken stabil halten und den Ellbogen kontrolliert Richtung Hüfte ziehen.', form:['Schulterblatt zieht mit','Hals lang','Langsam ablassen']},
-  {id:'press', n:4, title:'Floor Press', img:'04-floor-press.png', weight:'10 kg', cls:'kg10', sets:'2–3 × 8–12', area:'Brust · Trizeps', cue:'Auf dem Boden drücken, Ellbogen berühren kontrolliert den Boden. Sicherer als Bankdrücken ohne Bank.', form:['Handgelenke stabil','Ellbogen ca. 45°','Nicht auf den Boden knallen']},
-  {id:'lunge', n:5, title:'Reverse Lunge', img:'05-reverse-lunge.png', weight:'7,5 kg', cls:'kg75', sets:'2–3 × 8–10/Seite', area:'Beine · Balance', cue:'Rückwärts ausfallschreiten, vorderes Bein arbeitet. 7,5 kg ist hier ein sinnvoller Startwert, bis die Bewegung stabil sitzt.', form:['Oberkörper aufrecht','Frontfuß voll belastet','Erst stabil, dann schwerer']},
-  {id:'ohp', n:6, title:'Shoulder Press', img:'06-shoulder-press.png', weight:'7,5 kg', cls:'kg75', sets:'2–3 × 8–10', area:'Schulter · Trizeps', cue:'Aus Schulterhöhe über Kopf drücken, Rippen unten halten. Wenn der Rücken ausweicht: Gewicht runter.', form:['Po/Core anspannen','Kein Hohlkreuz','Hanteln kontrolliert senken']},
-  {id:'latraise', n:7, title:'Lateral Raise', img:'07-lateral-raise.png', weight:'5 kg', cls:'kg5', sets:'2–3 × 10–15', area:'Seitliche Schulter', cue:'Leicht und kontrolliert ausführen. Arme bis etwa Schulterhöhe heben, ohne Schwung zu holen.', form:['Leichte Ellbogenbeuge','Schultern unten','2 Sekunden ablassen']},
-  {id:'curl', n:8, title:'Biceps Curl', img:'08-biceps-curl.png', weight:'10 kg', cls:'kg10', sets:'2–3 × 8–12', area:'Bizeps', cue:'Oberarme bleiben ruhig am Körper. Wenn Schwung aus Hüfte oder Rücken nötig ist, ist das Gewicht zu hoch.', form:['Handflächen nach vorn/oben','Nicht schaukeln','Oben kurz anspannen']},
-  {id:'triceps', n:9, title:'Overhead Triceps Extension', img:'09-triceps-extension.png', weight:'10 kg · 1 Hantel', cls:'kg10', sets:'2–3 × 10–12', area:'Trizeps', cue:'Eine Hantel mit beiden Händen. Ellbogen eng, langsam hinter den Kopf, sauber strecken.', form:['Rippen unten','Ellbogen zeigen nach vorn','Nicht ins Hohlkreuz']},
-  {id:'revfly', n:10, title:'Reverse Fly', img:'10-reverse-fly.png', weight:'5 kg', cls:'kg5', sets:'2–3 × 10–15', area:'Hintere Schulter · oberer Rücken', cue:'In der Hinge-Position die Arme kontrolliert zur Seite öffnen. Besonders gut für hintere Schulter und oberen Rücken.', form:['Nacken entspannt','Schulterblätter arbeiten','Kein Schwung']}
-];
+'use strict';
 
-const $ = s => document.querySelector(s);
-const storageKey = 'domse-sport-done-v1';
-let done = JSON.parse(localStorage.getItem(storageKey) || '{}');
+(() => {
+  const exerciseIds = ['goblet', 'rdl', 'row', 'press', 'lunge', 'ohp', 'latraise', 'curl', 'triceps', 'revfly'];
+  const legacyKey = 'domse-sport-done-v1';
+  const localDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const storageKey = `domse-sport-session-v2:${localDate()}`;
+  let storageAvailable = true;
 
-function renderExercises(){
-  const grid = $('#exerciseGrid');
-  grid.innerHTML = exercises.map(e => `
-    <article class="exercise-card reveal" id="${e.id}">
-      <img src="/sport/assets/exercises/${e.img}" alt="${e.title} Anleitung">
-      <div class="exercise-body">
-        <div class="exercise-top"><div><p class="eyebrow">${e.area}</p><h3>${e.title}</h3></div><span class="num">${String(e.n).padStart(2,'0')}</span></div>
-        <div class="badges"><span class="badge ${e.cls}">${e.weight}</span><span class="badge">${e.sets}</span></div>
-        <p class="cue">${e.cue}</p>
-        <ul class="form-list">${e.form.map(x=>`<li>${x}</li>`).join('')}</ul>
-        <label class="done-row"><span>Heute erledigt</span><input type="checkbox" data-done="${e.id}" ${done[e.id]?'checked':''}></label>
-      </div>
-    </article>`).join('');
-  grid.querySelectorAll('[data-done]').forEach(input => input.addEventListener('change', e => {
-    done[e.target.dataset.done] = e.target.checked;
-    localStorage.setItem(storageKey, JSON.stringify(done));
+  const emptyState = () => ({
+    version: 2,
+    date: localDate(),
+    done: {},
+    warmup: false,
+    form: false,
+    timer: { elapsedMs: 0, runningSince: null }
+  });
+
+  function safeRead(key) {
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (raw === null) return null;
+      const value = JSON.parse(raw);
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+    } catch (error) {
+      if (error?.name === 'SecurityError') storageAvailable = false;
+      return null;
+    }
+  }
+
+  function safeWrite(key, value) {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (_error) {
+      storageAvailable = false;
+      return false;
+    }
+  }
+
+  function normaliseState(candidate) {
+    const clean = emptyState();
+    if (!candidate || candidate.version !== 2 || candidate.date !== localDate()) return clean;
+    if (candidate.done && typeof candidate.done === 'object') {
+      for (const id of exerciseIds) clean.done[id] = candidate.done[id] === true;
+    }
+    clean.warmup = candidate.warmup === true;
+    clean.form = candidate.form === true;
+    const timer = candidate.timer;
+    if (timer && Number.isFinite(timer.elapsedMs) && timer.elapsedMs >= 0) {
+      clean.timer.elapsedMs = Math.min(timer.elapsedMs, 24 * 60 * 60 * 1000);
+    }
+    if (timer && Number.isFinite(timer.runningSince) && timer.runningSince > 0 && timer.runningSince <= Date.now()) {
+      clean.timer.runningSince = timer.runningSince;
+    }
+    return clean;
+  }
+
+  const saved = safeRead(storageKey);
+  let state = normaliseState(saved);
+  if (!saved) {
+    const legacy = safeRead(legacyKey);
+    if (legacy) {
+      for (const id of exerciseIds) state.done[id] = legacy[id] === true;
+    }
+    safeWrite(storageKey, state);
+  }
+
+  const timerOutput = document.querySelector('#timer');
+  const timerStatus = document.querySelector('#timerStatus');
+  const progress = document.querySelector('#progress');
+  const doneCount = document.querySelector('#doneCount');
+  const warmupCheck = document.querySelector('#warmupCheck');
+  const formCheck = document.querySelector('#formCheck');
+  const storageStatus = document.querySelector('#storageStatus');
+  const startButton = document.querySelector('[data-timer="start"]');
+  const pauseButton = document.querySelector('[data-timer="pause"]');
+  let timerHandle = null;
+
+  function currentElapsed() {
+    if (state.timer.runningSince === null) return state.timer.elapsedMs;
+    return state.timer.elapsedMs + (Date.now() - state.timer.runningSince);
+  }
+
+  function formatElapsed(milliseconds) {
+    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (hours > 0) return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+
+  function drawTimer() {
+    timerOutput.textContent = formatElapsed(currentElapsed());
+  }
+
+  function beginTicking() {
+    if (timerHandle !== null) return;
+    timerHandle = window.setInterval(drawTimer, 250);
+  }
+
+  function stopTicking() {
+    if (timerHandle !== null) window.clearInterval(timerHandle);
+    timerHandle = null;
+  }
+
+  function persist() {
+    const stored = safeWrite(storageKey, state);
+    if (storageStatus) {
+      storageStatus.textContent = stored
+        ? 'Dein Trainingsstand wird nur in diesem Browser gespeichert.'
+        : 'Der Browser blockiert die Speicherung. Die aktuelle Session funktioniert, geht nach dem Schließen aber verloren.';
+      storageStatus.classList.toggle('is-error', !stored);
+    }
+    return stored;
+  }
+
+  function setTimerStatus(message) {
+    timerStatus.textContent = message;
+  }
+
+  function updateTimerControls() {
+    const running = state.timer.runningSince !== null;
+    startButton.disabled = running;
+    pauseButton.disabled = !running;
+  }
+
+  function startTimer() {
+    if (state.timer.runningSince !== null) return;
+    state.timer.runningSince = Date.now();
+    persist();
+    beginTicking();
+    updateTimerControls();
+    setTimerStatus('Timer läuft.');
+  }
+
+  function pauseTimer() {
+    if (state.timer.runningSince === null) return;
+    state.timer.elapsedMs += Date.now() - state.timer.runningSince;
+    state.timer.runningSince = null;
+    persist();
+    stopTicking();
+    drawTimer();
+    updateTimerControls();
+    setTimerStatus('Timer pausiert.');
+  }
+
+  function resetTimer() {
+    stopTicking();
+    state.timer = { elapsedMs: 0, runningSince: null };
+    persist();
+    drawTimer();
+    updateTimerControls();
+    setTimerStatus('Timer zurückgesetzt.');
+  }
+
+  function updateProgress() {
+    const count = exerciseIds.filter((id) => state.done[id] === true).length;
+    doneCount.textContent = `${count}/10`;
+    progress.value = count;
+    progress.textContent = `${count} von 10`;
+  }
+
+  function applyState() {
+    document.querySelectorAll('[data-done]').forEach((input) => {
+      input.checked = state.done[input.dataset.done] === true;
+    });
+    warmupCheck.checked = state.warmup;
+    formCheck.checked = state.form;
     updateProgress();
-  }));
-  setupReveal();
-  updateProgress();
-}
+    drawTimer();
+    updateTimerControls();
+    if (!storageAvailable && storageStatus) {
+      storageStatus.textContent = 'Der Browser blockiert die Speicherung. Die aktuelle Session funktioniert, geht nach dem Schließen aber verloren.';
+      storageStatus.classList.add('is-error');
+    }
+    if (state.timer.runningSince !== null) {
+      beginTicking();
+      setTimerStatus('Timer läuft.');
+    }
+  }
 
-function updateProgress(){
-  const count = exercises.filter(e => done[e.id]).length;
-  $('#doneCount').textContent = `${count}/10`;
-  $('#progress').value = count;
-}
+  document.querySelectorAll('[data-timer]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const actions = { start: startTimer, pause: pauseTimer, reset: resetTimer };
+      const action = actions[button.dataset.timer];
+      if (action) action();
+    });
+  });
 
-$('#resetChecks')?.addEventListener('click', () => {
-  done = {}; localStorage.setItem(storageKey, '{}');
-  document.querySelectorAll('[data-done]').forEach(i => i.checked = false);
-  updateProgress();
-});
+  document.querySelectorAll('[data-done]').forEach((input) => {
+    input.addEventListener('change', () => {
+      state.done[input.dataset.done] = input.checked;
+      persist();
+      updateProgress();
+    });
+  });
 
-let timer = 0, timerHandle = null;
-function drawTimer(){ const m=String(Math.floor(timer/60)).padStart(2,'0'); const s=String(timer%60).padStart(2,'0'); $('#timer').textContent=`${m}:${s}`; }
-document.querySelectorAll('[data-timer]').forEach(btn => btn.addEventListener('click', () => {
-  const action = btn.dataset.timer;
-  if(action === 'start' && !timerHandle) timerHandle = setInterval(()=>{timer++; drawTimer();},1000);
-  if(action === 'pause'){ clearInterval(timerHandle); timerHandle = null; }
-  if(action === 'reset'){ clearInterval(timerHandle); timerHandle = null; timer = 0; drawTimer(); }
-}));
+  warmupCheck.addEventListener('change', () => {
+    state.warmup = warmupCheck.checked;
+    persist();
+  });
 
-function setupReveal(){
-  const items = document.querySelectorAll('.reveal:not(.visible)');
-  if(!('IntersectionObserver' in window)){ items.forEach(i=>i.classList.add('visible')); return; }
-  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-    if(entry.isIntersecting){ entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-  }), {threshold:.12});
-  items.forEach(i=>observer.observe(i));
-}
+  formCheck.addEventListener('change', () => {
+    state.form = formCheck.checked;
+    persist();
+  });
 
-renderExercises();
-setupReveal();
-drawTimer();
+  document.querySelector('#resetSession').addEventListener('click', () => {
+    const confirmed = window.confirm('Heutige Häkchen und Timer wirklich zurücksetzen?');
+    if (!confirmed) return;
+    stopTicking();
+    state = emptyState();
+    persist();
+    applyState();
+    setTimerStatus('Heutige Session zurückgesetzt.');
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) drawTimer();
+  });
+  window.addEventListener('pagehide', persist);
+
+  applyState();
+})();
