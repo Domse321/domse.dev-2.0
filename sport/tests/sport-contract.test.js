@@ -25,14 +25,20 @@ test('Sportseite ist eigenständig, semantisch und strikt abgesichert', () => {
   assert.doesNotMatch(html, /<script(?![^>]+src=)/i);
 });
 
-test('zehn Übungen bleiben als verständlicher Inhalt ohne Technikbilder erhalten', () => {
+test('zehn Übungen bleiben mit verständlichen Start-/Endpositionsbildern nutzbar', () => {
   assert.equal(count(/<article class="exercise-card"/g, html), 10);
   assert.equal(count(/data-done="/g, html), 10);
   assert.equal(count(/class="block-divider"/g, html), 2);
   for (const title of ['Goblet Squat', 'Romanian Deadlift', 'One-Arm Row', 'Floor Press', 'Reverse Lunge', 'Shoulder Press', 'Lateral Raise', 'Biceps Curl', 'Overhead Triceps Extension', 'Reverse Fly']) {
     assert.match(html, new RegExp(title));
   }
-  assert.doesNotMatch(html, /assets\/exercises|Übungsbild|Anleitungsbild/i);
+  assert.equal(count(/<figure class="exercise-visual">/g, html), 10);
+  assert.equal(count(/assets\/exercises\/\d\d-[a-z-]+\.webp/g, html), 10);
+  assert.equal(count(/<img src="assets\/exercises\//g, html), 10);
+  assert.match(html, /alt="Goblet Squat: Start- und Endposition mit Kurzhantel"/);
+  for (const file of ['01-goblet-squat.webp', '02-romanian-deadlift.webp', '03-one-arm-row.webp', '04-floor-press.webp', '05-reverse-lunge.webp', '06-shoulder-press.webp', '07-lateral-raise.webp', '08-biceps-curl.webp', '09-triceps-extension.webp', '10-reverse-fly.webp']) {
+    assert.ok(fs.existsSync(path.join(root, 'sport/assets/exercises', file)), file);
+  }
   assert.doesNotMatch(html + css + js, /\breveal\b|IntersectionObserver|conic-gradient|fractalNoise/i);
 });
 

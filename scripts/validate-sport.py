@@ -69,7 +69,11 @@ require(":focus-visible" in css, "sichtbarer Tastaturfokus fehlt")
 require("min-height: 44px" in css, "44-Pixel-Ziel fehlt")
 require("prefers-reduced-motion: reduce" in css, "Reduced-Motion-Regel fehlt")
 require("forced-colors: active" in css, "Forced-Colors-Regel fehlt")
-require(not (SPORT / "assets/exercises").exists(), "alte Übungsillustrationen sind noch vorhanden")
+exercise_images = sorted((SPORT / "assets/exercises").glob("*.webp")) if (SPORT / "assets/exercises").is_dir() else []
+require(len(exercise_images) == 10, "genau zehn lokale Übungsbilder erforderlich")
+require(len(re.findall(r'<figure class="exercise-visual">', html)) == 10, "jede Übung benötigt ein Bild")
+for image in exercise_images:
+    require(f'assets/exercises/{image.name}' in html, f"Übungsbild nicht eingebunden: {image.name}")
 require(manifest_path.exists(), "Medienmanifest fehlt")
 
 if manifest_path.exists():

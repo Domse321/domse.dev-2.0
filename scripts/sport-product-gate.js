@@ -83,6 +83,18 @@ async function observe(page) {
         await page.evaluate((size) => { document.documentElement.style.fontSize = `${size}%`; }, config.text);
         await page.waitForTimeout(100);
       }
+      await page.locator('.exercise-visual img').evaluateAll(async (images) => {
+        for (const image of images) {
+          image.scrollIntoView({ block: 'center' });
+          if (!image.complete || image.naturalWidth === 0) {
+            await new Promise((resolve) => {
+              image.addEventListener('load', resolve, { once: true });
+              image.addEventListener('error', resolve, { once: true });
+            });
+          }
+        }
+      });
+      await page.evaluate(() => window.scrollTo(0, 0));
 
       const geometry = await page.evaluate(() => {
         const controls = [...document.querySelectorAll('a, button, label')]
